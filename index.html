@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Test Cumplea&nacute;os</title>
+</head>
+<body>
+<script type="text/javascript">
+	var base_url = "http://localhost:8080"
+	var lista;
+	document.addEventListener("DOMContentLoaded", function(event){
+		listar();
+	});
+	function agregar(){
+		var persona = {
+			"name": document.getElementById("nombre").value,
+			"lastName": document.getElementById("apellido").value,
+			"birthDate": document.getElementById("nacimiento").value
+		}
+		var http = new XMLHttpRequest();
+		http.onload = function() {
+			if(this.status == 200){
+				listar();
+			}
+		}
+		http.open('POST',base_url + "/setPerson", true);
+		http.setRequestHeader("Content-Type", "application/json");
+		var json = JSON.stringify(persona);
+		http.send(json);
+		return false;
+	}
+	function listar(){
+		
+		var http = new XMLHttpRequest();
+		http.onload = function() {
+			if(this.status == 200){
+				console.log("ok");
+				lista = http.response;
+				var div = document.getElementById("personas");
+				div.innerHTML = "<table id='tabla'><th>Nombre</th><th>Apellidos</th><th>Fecha Nacimiento</th><th>Edad</th><th>D&iacute;as o Poema</th></table>";
+				var table = document.getElementById("tabla");
+				lista.forEach(function(e){
+					var tr = document.createElement("tr");
+					td = tr.insertCell(-1);
+					td.innerHTML = e.name;
+					td = tr.insertCell(-1);
+					td.innerHTML = e.lastName;
+					td = tr.insertCell(-1);
+					td.innerHTML = e.birthDate;
+					td = tr.insertCell(-1);
+					td.innerHTML = e.age;
+					td = tr.insertCell(-1);
+					td.innerHTML = (e.days == 0) ? e.poem : e.days;
+					table.appendChild(tr);
+				});
+			}
+		};
+		http.open('GET',base_url + "/getPersons", true);
+		http.setRequestHeader("Content-Type", "application/json");
+		http.responseType = 'json';
+		http.send();
+		return false;
+	}
+</script>
+<form id="form_agregar" action="" onsubmit=" return agregar()">
+	<label>Nombres:</label><input type="text" id="nombre" name="nombre" /><br />
+	<label>Apellidos:</label><input type="text" id="apellido" name="apellido" /><br />
+	<label>Fecha de Nacimiento:</label><input type="text" id="nacimiento" name="nacimiento" /><br />
+	<input type="submit" value="Agregar">
+</form>
+<br />
+<br />
+<div id="personas">
+</div>
+</body>
+</html>
